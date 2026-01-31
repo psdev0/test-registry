@@ -1,0 +1,11 @@
+{
+  "name": "card",
+  "type": "component",
+  "files": [
+    {
+      "source": "card.tsx",
+      "path": "components/ui/card.tsx"
+    }
+  ],
+  "dependencies": ["intro.js", "eslint"]
+}
