@@ -1,0 +1,11 @@
+{
+  "name": "button",
+  "type": "component",
+  "files": [
+    {
+      "source": "button.tsx",
+      "path": "components/ui/button.tsx"
+    }
+  ],
+  "dependencies": ["clsx"]
+}
