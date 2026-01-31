@@ -5,25 +5,19 @@ import { execSync } from "child_process";
 const REPO_RAW_BASE =
   "https://raw.githubusercontent.com/psdev0/test-registry/refs/heads/main/registry";
 
-/**
- * Usage:
- * node install-components.mjs button card modal
- */
 async function run() {
-  const componentNames = process.argv.slice(2);
+  const componentArgs = process.argv.slice(2);
 
-  if (componentNames.length === 0) {
-    console.log(
-      "❌ Usage: node install-components.mjs <component1> <component2> ...",
-    );
+  if (componentArgs.length === 0) {
+    console.log("❌ Usage: node install-components.mjs <component[:variant]> ...");
     process.exit(1);
   }
 
-  for (const componentName of componentNames) {
+  for (const arg of componentArgs) {
+    const [componentName, variantName = "default"] = arg.split(":");
     const REGISTRY_URL = `${REPO_RAW_BASE}/${componentName}`;
-    console.log(`\nFetching component: ${componentName}`);
+    console.log(`\nFetching component: ${componentName} (variant: ${variantName})`);
 
-    // 1️⃣ Fetch metadata
     const metaRes = await fetch(`${REGISTRY_URL}/index.json`);
     if (!metaRes.ok) {
       console.error(`❌ Component not found: ${componentName}`);
@@ -31,27 +25,31 @@ async function run() {
     }
     const meta = await metaRes.json();
 
-    // 2️⃣ Install dependencies
+    // 1️⃣ Install dependencies
     if (meta.dependencies && meta.dependencies.length > 0) {
       console.log("Installing dependencies:", meta.dependencies.join(", "));
-      execSync(`npm install ${meta.dependencies.join(" ")}`, {
-        stdio: "inherit",
-      });
+      execSync(`npm install ${meta.dependencies.join(" ")}`, { stdio: "inherit" });
+    }
+
+    // 2️⃣ Determine files to download
+    let files = meta.files || [];
+    if (meta.variants && meta.variants[variantName]) {
+      files = meta.variants[variantName].files;
     }
 
     // 3️⃣ Download files
-    for (const file of meta.files) {
+    for (const file of files) {
       const sourceUrl = `${REGISTRY_URL}/${file.source}`;
       const destPath = path.resolve(process.cwd(), file.path);
 
       console.log(`Downloading ${file.source}`);
-      const content = await fetch(sourceUrl).then((r) => r.text());
+      const content = await fetch(sourceUrl).then(r => r.text());
 
       fs.mkdirSync(path.dirname(destPath), { recursive: true });
       fs.writeFileSync(destPath, content);
     }
 
-    console.log(`✅ Component "${componentName}" installed`);
+    console.log(`✅ Component "${componentName}" (variant: ${variantName}) installed`);
   }
 }
 
