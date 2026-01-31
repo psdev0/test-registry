@@ -11,7 +11,18 @@ const REPO_RAW_BASE =
  * node install-components.mjs button button:icon card modal
  */
 async function run() {
-    const componentArgs = process.argv.slice(2);
+    // const componentArgs = process.argv.slice(2);
+    // Extract --update flag
+    const allArgs = process.argv.slice(2);
+    const updateMode = allArgs.includes("--update");
+
+    // Filter out --update from component list
+    const componentArgs = allArgs.filter(arg => arg !== "--update");
+
+    if (componentArgs.length === 0) {
+        console.log("❌ Usage: node install-components.mjs <component[:variant]> ... [--update]");
+        process.exit(1);
+    }
 
     if (componentArgs.length === 0) {
         console.log(
