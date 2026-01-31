@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 const REGISTRY_URL =
-  "https://raw.githubusercontent.com/psdev0/registry-test/main/registry/button";
+  "https://raw.githubusercontent.com/psdev0/test-registry/refs/heads/main/registry/button";
 
 async function run() {
   console.log("Fetching registry metadata...");
