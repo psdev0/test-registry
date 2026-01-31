@@ -89,13 +89,14 @@ async function run() {
                 const content = await fetch(sourceUrl).then((r) => r.text());
 
                 let shouldWrite = true;
+        
                 if (fs.existsSync(destPath)) {
                     const existingContent = fs.readFileSync(destPath, "utf-8");
-                    if (existingContent === content && !process.argv.includes("--update")) {
-                        console.log(`Skipping ${file.source}, already up-to-date`);
-                        shouldWrite = false;
+                    if (existingContent === content && !updateMode) {
+                      console.log(`Skipping ${file.source}, already up-to-date`);
+                      shouldWrite = false;
                     }
-                }
+                  }
 
                 if (shouldWrite) {
                     fs.mkdirSync(path.dirname(destPath), { recursive: true });
